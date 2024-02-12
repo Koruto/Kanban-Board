@@ -1,5 +1,11 @@
+import Kanban from './Kanban';
+
 function App() {
-  return <>Hellow World</>;
+  return (
+    <div className="App">
+      <Kanban />
+    </div>
+  );
 }
 
 export default App;
