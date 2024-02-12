@@ -1,8 +1,8 @@
 import { Draggable } from '@hello-pangea/dnd';
-import BlueArrow from './BlueArrow';
-import CustomAvatar from './CustomAvatar';
-import RedArrow from './RedArrow';
-import YellowArrow from './YellowArrow';
+import BlueArrow from './elements/BlueArrow';
+import CustomAvatar from './elements/CustomAvatar';
+import RedArrow from './elements/RedArrow';
+import YellowArrow from './elements/YellowArrow';
 import TaskItem from './types/TaskItem';
 
 interface TaskCardProps {

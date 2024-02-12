@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { columnsFromBackend } from './KanbanData';
+import { columnsFromBackend } from './database/KanbanData';
 import { DragDropContext, DropResult, Droppable } from '@hello-pangea/dnd';
 import TaskCard from './TaskCard';
 import ColumnList from './types/ColumnList';
+import CreateItem from './items/create/CreateTaskItem';
 
 type DragEndHandlerProps = (
   result: DropResult,
@@ -12,6 +13,16 @@ type DragEndHandlerProps = (
 
 const Kanban = () => {
   const [columns, setColumns] = useState<ColumnList>(columnsFromBackend);
+
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+
+  const openModal = () => {
+    setShowCreateModal(true);
+  };
+
+  const closeModal = () => {
+    setShowCreateModal(false);
+  };
 
   const onDragEnd: DragEndHandlerProps = (
     result: DropResult,
@@ -68,6 +79,13 @@ const Kanban = () => {
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                   >
+                    <button
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={openModal}
+                    >
+                      Add Issue
+                    </button>
+                    <CreateItem isOpen={showCreateModal} onClose={closeModal} />
                     <div className="text-[#10957d] bg-[#10957d] bg-opacity-20 px-10 py-2 rounded-[5px] self-start">
                       {column.title}
                     </div>
