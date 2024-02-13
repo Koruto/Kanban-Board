@@ -1,18 +1,47 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SelectWithOptions from './SelectWithOptions';
 import { data } from '../../database/KanbanData';
+import fetchColumnList from '../../api/fetchColumnList';
+import postDataToBackend from '../../api/postIssue';
 
 interface ItemFormProps {
   onClose: () => void;
 }
 
+async function getColumnList() {
+  const dataL = await fetchColumnList();
+  const columnList = dataL.map((item: { id: number; column_name: string }) => {
+    return item.column_name;
+  });
+
+  return columnList;
+}
+
 const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
   const [selectedValues, setSelectedValues] = useState({
-    status: 'To-Do',
+    status: '',
     assignee: 'Unassigned',
   });
   const [summary, setSummary] = useState('');
   const [description, setDescription] = useState('');
+
+  const [statusOptions, setStatusOptions] = useState([
+    'To-do',
+    'In Progress',
+    'Option 3',
+    'Option 4',
+  ]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setStatusOptions(await getColumnList());
+      } catch (error) {
+        console.error('Error fetching column list:', error);
+      }
+    }
+    fetchData();
+  }, []);
 
   const options = ['To-do', 'In Progress', 'Option 3', 'Option 4'];
 
@@ -52,6 +81,18 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
     data.push(newItem);
     console.log(data);
 
+    const postData = {
+      task: summary,
+      assignee: selectedValues['assignee'],
+      status: selectedValues['status'],
+    };
+
+    const resulte = await postDataToBackend(
+      'http://localhost:3000/add/issue',
+      postData
+    );
+    console.log(resulte);
+
     onClose();
   };
 
@@ -60,9 +101,9 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
       <div>
         <h2 className="font-bold mb-2">Status</h2>
         <SelectWithOptions
-          title="To-Do"
+          title="Status"
           name="status"
-          options={options}
+          options={statusOptions}
           onSelect={handleSelect}
         />
       </div>

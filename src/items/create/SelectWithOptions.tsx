@@ -6,7 +6,6 @@ interface SelectWithOptionsProps {
 }
 
 const SelectWithOptions: React.FC<SelectWithOptionsProps> = ({
-  title,
   options,
   onSelect,
   name,
@@ -17,7 +16,6 @@ const SelectWithOptions: React.FC<SelectWithOptionsProps> = ({
       onChange={(e) => onSelect(name, e.target.value)}
       className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
     >
-      <option value="">Select an option</option>
       {options.map((option, index) => (
         <option key={index} value={option}>
           {option}
