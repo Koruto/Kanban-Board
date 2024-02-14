@@ -136,7 +136,6 @@ const Kanban: React.FC<KanbanProps> = ({ setLogIn }) => {
       }
     }
 
-    // Call the function with the column name you want to delete
     await deleteBoard(columnId);
     await updateData(setColumns);
   }

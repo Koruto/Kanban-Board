@@ -61,8 +61,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
     fetchData();
   }, []);
 
-  // const options = ['To-do', 'In Progress', 'Option 3', 'Option 4'];
-
   const handleSelect = (name: string, value: string) => {
     setSelectedValues((prevState) => ({
       ...prevState,
@@ -82,9 +80,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
       alert('Status cannot be empty!');
       return;
     }
-    // TODO Before Adding check if Title is empty or not, if it is then break it or something
-
-    // TODO Upon Submit clear the form data too
 
     const userId =
       selectedValues['assignee'] == 'Unassigned'

@@ -6,9 +6,7 @@ interface AuthenticationProps {
   setLogIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-// Define your component
 const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
-  // Define your state hooks
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -32,7 +30,6 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
     password: '',
   });
 
-  // Define your change handlers
   const handleSignupChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSignupFormData({ ...signupFormData, [name]: value });
@@ -48,10 +45,8 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
     setLoginFormData({ ...loginFormData, [name]: value });
   };
 
-  // Define your form submission handlers
   const handleSignupSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Add your signup form submission logic here
 
     if (
       signupFormData.name == '' ||
@@ -61,7 +56,6 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
       alert('Sign Up Fields cannot be empty');
       return;
     }
-    // Call the async function to make the signup request
     await signup(signupFormData);
     toggleLogin();
 
@@ -70,16 +64,11 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
 
   const handleLoginSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Add your login form submission logic here
 
     if (loginFormData.password == '' || loginFormData.username == '') {
       alert('Log In Fields cannot be empty');
       return;
     }
-
-    // Make a POST request to the /login endpoint
-
-    // Call the async function to make the login request
 
     const key = await login(loginFormData);
     if (key) {
@@ -105,7 +94,6 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
     setShowSignup(true);
   };
 
-  // Return your JSX
   return (
     <div className={`bg-white h-full ${visible ? '' : 'hidden'}`}>
       <div className="max-w-md mx-auto p-8">

@@ -6,7 +6,6 @@ const db = await openConnection();
 
 router.put('/updateIssue', (req, res) => {
   const { uniqueId, destTitle } = req.body;
-  // Execute the SQL UPDATE query
 
   db.run(
     `UPDATE Issue
@@ -21,12 +20,6 @@ router.put('/updateIssue', (req, res) => {
       return res.status(200).send('Updated Row');
     }
   );
-
-  // Update rows with new order_index and status
-
-  // Update order_index for the source column
-
-  // Update order_index for the destination column
 });
 
 export default router;

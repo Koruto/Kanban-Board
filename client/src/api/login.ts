@@ -17,9 +17,7 @@ export default async function login(loginData: {
 
     const data = await response.json();
     return data;
-
   } catch (error) {
-    // Handle errors
     console.error('Error:', error);
   }
 }

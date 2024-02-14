@@ -111,8 +111,6 @@ router.post('/add/issue/', (req, res) => {
       res.send(`Row inserted with ID: ${this.lastID}`);
     }
   );
-
-  // Do something with the parameters
 });
 
 export default router;

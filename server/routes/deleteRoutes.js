@@ -6,7 +6,6 @@ const db = await openConnection();
 router.delete('/delete/issue/:uniqueId', (req, res) => {
   const uniqueIdToDelete = req.params.uniqueId;
 
-  // Execute the delete query
   db.run(
     `DELETE FROM Issue WHERE unique_id = ?`,
     [uniqueIdToDelete],
@@ -26,7 +25,6 @@ router.delete('/delete/board/:columnName', async (req, res) => {
   const { columnName } = req.params;
 
   try {
-    // Delete rows from the Issue table where status matches columnName
     db.run(`DELETE FROM Issue WHERE status = '${columnName}'`, function (err) {
       if (err) {
         console.error('Error:', err);
@@ -48,8 +46,6 @@ router.delete('/delete/board/:columnName', async (req, res) => {
         }
       );
     });
-
-    // Delete the column name from the column_list table
   } catch (error) {
     console.error('Error deleting rows:', error);
     res.status(500).send('Internal Server Error');

@@ -15,10 +15,7 @@ export default async function signup(signupData: {
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-
-    // Handle the response data
   } catch (error) {
-    // Handle errors
     console.error('Error:', error);
   }
 }

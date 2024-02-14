@@ -80,8 +80,6 @@ router.get('/initTable', (req, res) => {
 });
 
 router.get('/initLogin', (req, res) => {
-  // Create a table for user details
-
   db.run(
     `
         CREATE TABLE IF NOT EXISTS users (
