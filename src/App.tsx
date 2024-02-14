@@ -6,7 +6,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   return (
-    <div className="h-full">
+    <div className="h-full ">
       {isLoggedIn ? (
         <Kanban setLogIn={setIsLoggedIn} />
       ) : (

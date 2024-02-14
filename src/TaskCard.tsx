@@ -57,13 +57,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, index }) => {
         >
           <div className="flex flex-col justify-center items-start px-4 min-h-28 rounded-lg max-w-[311px] bg-white mt-4 w-full">
             <div className="flex justify-between w-full">
-              <p>{item.task}</p>
+              <p className=" font-bold">{item.task}</p>
+
               <button
                 onClick={() => handleDelete(item.unique_id, item.user_id)}
               >
                 <MdDelete fill="bg-red-400" size={24} style={{ fill: 'red' }} />
               </button>
             </div>
+            <span>{item.description}</span>
             <div className="flex justify-between items-center w-full text-xs font-normal text-[#7d7d7d]">
               <div>
                 <span>

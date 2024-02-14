@@ -52,10 +52,19 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
   const handleSignupSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Add your signup form submission logic here
-    console.log('Signup Form submitted:', signupFormData);
 
+    console.log('Signup Form submitted:', signupFormData);
+    if (
+      signupFormData.name == '' ||
+      signupFormData.password == '' ||
+      signupFormData.username == ''
+    ) {
+      alert('Sign Up Fields cannot be empty');
+      return;
+    }
     // Call the async function to make the signup request
     await signup(signupFormData);
+    toggleLogin();
 
     setSignupFormData({ username: '', name: '', password: '', role: 'User' });
   };
@@ -64,6 +73,10 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
     e.preventDefault();
     // Add your login form submission logic here
     console.log('Login Form submitted:', loginFormData);
+    if (loginFormData.password == '' || loginFormData.username == '') {
+      alert('Log In Fields cannot be empty');
+      return;
+    }
 
     // Make a POST request to the /login endpoint
 
@@ -73,93 +86,168 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
     if (key) {
       setLogIn(true);
       localStorage.setItem('user', JSON.stringify(key));
+    } else {
+      alert('Invalid Login');
     }
+
+    setLoginFormData({ username: '', password: '' });
 
     console.log(key);
   };
 
+  const [showLogin, setShowLogin] = useState(true);
+  const [showSignup, setShowSignup] = useState(false);
+
+  const toggleLogin = () => {
+    setShowLogin(true);
+    setShowSignup(false);
+  };
+
+  const toggleSignup = () => {
+    setShowLogin(false);
+    setShowSignup(true);
+  };
+
   // Return your JSX
   return (
-    <div className={`bg-white ${visible ? '' : 'hidden'}`}>
-      {/* Signup Form */}
-      <form onSubmit={handleSignupSubmit}>
-        {/* Input fields for signup */}
-        {/* Username */}
-        <label htmlFor="username">Username:</label>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          className=" outline"
-          value={signupFormData.username}
-          onChange={handleSignupChange}
-        />
-        {/* name */}
-        <label htmlFor="name">Name:</label>
-        <input
-          className=" outline"
-          type="name"
-          id="name"
-          name="name"
-          value={signupFormData.name}
-          onChange={handleSignupChange}
-        />
-        {/* Password */}
+    <div className={`bg-white h-full ${visible ? '' : 'hidden'}`}>
+      <div className="max-w-md mx-auto p-8">
+        <div className="flex justify-center">
+          <button
+            onClick={toggleLogin}
+            className={`py-2 px-4 mr-2 ${
+              showLogin ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+            }`}
+          >
+            Login
+          </button>
+          <button
+            onClick={toggleSignup}
+            className={`py-2 px-4 ${
+              showLogin ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'
+            }`}
+          >
+            Sign Up
+          </button>
+        </div>
 
-        <label htmlFor="password">Password:</label>
-        <input
-          className=" outline"
-          type="password"
-          id="password"
-          name="password"
-          value={signupFormData.password}
-          onChange={handleSignupChange}
-        />
-
-        <label htmlFor="role">Role:</label>
-        <select
-          id="role"
-          name="role"
-          value={signupFormData.role}
-          onChange={handleSignupChangeSelect}
+        <form
+          onSubmit={handleSignupSubmit}
+          className={`mt-4 ${showSignup ? '' : 'hidden'}`}
         >
-          <option value="User">User</option>
-          <option value="Admin">Admin</option>
-        </select>
+          <div className="mb-4">
+            <label htmlFor="username" className="block mb-1">
+              Username:
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+              placeholder=" Enter Username"
+              value={signupFormData.username}
+              onChange={handleSignupChange}
+            />
+          </div>
 
-        {/* Submit button */}
-        <input className=" outline" type="submit" value="Signup" />
-      </form>
+          <div className="mb-4">
+            <label htmlFor="name" className="block mb-1">
+              Name:
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+              placeholder=" Enter Name"
+              value={signupFormData.name}
+              onChange={handleSignupChange}
+            />
+          </div>
 
-      {/* Login Form */}
-      <form onSubmit={handleLoginSubmit}>
-        {/* Input fields for login */}
-        {/* Username */}
-        <label htmlFor="loginUsername">Username:</label>
-        <input
-          className=" outline"
-          type="text"
-          id="loginUsername"
-          name="username"
-          value={loginFormData.username}
-          onChange={handleLoginChange}
-        />
-        {/* Password */}
-        <label htmlFor="loginPassword">Password:</label>
-        <input
-          className=" outline"
-          type="password"
-          id="loginPassword"
-          name="password"
-          value={loginFormData.password}
-          onChange={handleLoginChange}
-        />
-        {/* Submit button */}
-        <input className=" outline" type="submit" value="Login" />
-      </form>
+          <div className="mb-4">
+            <label htmlFor="password" className="block mb-1">
+              Password:
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder=" Enter Password"
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+              value={signupFormData.password}
+              onChange={handleSignupChange}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="role" className="block mb-1">
+              Role:
+            </label>
+            <select
+              id="role"
+              name="role"
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+              value={signupFormData.role}
+              onChange={handleSignupChangeSelect}
+            >
+              <option value="User">User</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full"
+            type="submit"
+          >
+            Signup
+          </button>
+        </form>
+
+        <form
+          onSubmit={handleLoginSubmit}
+          className={`mt-4 ${showLogin ? '' : 'hidden'} `}
+        >
+          <div className="mb-4">
+            <label htmlFor="loginUsername" className="block mb-1">
+              Username:
+            </label>
+            <input
+              type="text"
+              id="loginUsername"
+              name="username"
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+              placeholder=" Enter Username"
+              value={loginFormData.username}
+              onChange={handleLoginChange}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="loginPassword" className="block mb-1">
+              Password:
+            </label>
+            <input
+              type="password"
+              id="loginPassword"
+              name="password"
+              placeholder=" Enter Password"
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+              value={loginFormData.password}
+              onChange={handleLoginChange}
+            />
+          </div>
+
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full"
+            type="submit"
+          >
+            Login
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
 
-// Export your component
 export default Authentication;

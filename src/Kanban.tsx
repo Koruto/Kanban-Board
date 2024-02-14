@@ -9,7 +9,10 @@ import deleteBoard from './api/deleteBoard';
 import { ColumnContext } from './ColumnContext';
 import initBoard from './api/initBoard';
 import { PiPlus } from 'react-icons/pi';
-import { MdDelete } from 'react-icons/md';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 
 type DragEndHandlerProps = (
   result: DropResult,
@@ -176,20 +179,28 @@ const Kanban: React.FC<KanbanProps> = ({ setLogIn }) => {
 
   return (
     <ColumnContext.Provider value={{ columns, setColumns }}>
-      {username}
-      <br />
-      <button onClick={handleSignOut}>Sign Out</button>
+      <AppBar position="static" className="mb-10">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Welcome, {username}
+          </Typography>
+          <Button onClick={handleSignOut} color="inherit">
+            Sign Out
+          </Button>
+        </Toolbar>
+      </AppBar>
+
       <DragDropContext
         onDragEnd={(result) => onDragEnd(result, columns, setColumns)}
       >
-        <div className="flex">
+        <div className="flex ml-10">
           <div className="m-2 flex w-full min-h-[80vh]">
             {Object.entries(columns).map(([columnId, column]) => {
               return (
                 <Droppable key={columnId} droppableId={columnId}>
                   {(provided) => (
                     <div
-                      className="min-h-[100px] flex flex-col bg-[#f3f3f3] min-w-[341px] rounded-lg p-4 mr-12 space-y-1"
+                      className="min-h-[100px] flex flex-col bg-[#f7f8f9] min-w-[341px] rounded-lg p-4 mr-12 space-y-1"
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                     >
@@ -209,7 +220,7 @@ const Kanban: React.FC<KanbanProps> = ({ setLogIn }) => {
                         </button>
                       </div>
                       <button
-                        className=" hover:bg-gray-300 text-black-100 font-bold py-2 px-4 rounded flex items-center justify-start pl-8"
+                        className=" hover:bg-[#e9ebee] text-black-100 font-bold py-2 px-4 rounded flex items-center justify-start pl-8"
                         onClick={openModal}
                       >
                         <PiPlus />
@@ -234,9 +245,14 @@ const Kanban: React.FC<KanbanProps> = ({ setLogIn }) => {
                 type="text"
                 value={boardName}
                 onChange={(e) => setBoardName(e.target.value)}
-                placeholder="Enter board name"
+                placeholder=" Enter board name"
               />
-              <button onClick={handleAddBoard}>Add New Board</button>
+              <button
+                className="px-4 ml-2 bg-[#e9ebee]"
+                onClick={handleAddBoard}
+              >
+                Add New Board
+              </button>
             </div>
           </div>
         </div>

@@ -33,15 +33,10 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
     status: '',
     assignee: 'Unassigned',
   });
-  const [summary, setSummary] = useState('');
+  const [Title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
-  const [statusOptions, setStatusOptions] = useState([
-    'To-do',
-    'In Progress',
-    'Option 3',
-    'Option 4',
-  ]);
+  const [statusOptions, setStatusOptions] = useState(['']);
 
   const [userOptions, setUserOptions] = useState(['Unassigned']);
 
@@ -79,11 +74,20 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    console.log('Summary:', summary);
+    console.log('Title:', Title);
     console.log('Selected options:', selectedValues);
     console.log('Description:', description);
 
-    // TODO Before Adding check if Summary is empty or not, if it is then break it or something
+    if (Title == '') {
+      alert('Title cannot be empty!');
+      return;
+    }
+
+    if (selectedValues['status'] == '') {
+      alert('Status cannot be empty!');
+      return;
+    }
+    // TODO Before Adding check if Title is empty or not, if it is then break it or something
 
     // TODO Upon Submit clear the form data too
 
@@ -102,11 +106,12 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
             ?.username;
 
     const postData = {
-      task: summary,
+      task: Title,
       assignee: selectedValues['assignee'],
       status: selectedValues['status'],
       user_id: userId,
       username: userName,
+      description: description,
     };
 
     const resulte = await postDataToBackend(
@@ -133,18 +138,21 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
         />
       </div>
 
-      <h2>Summary</h2>
+      <h2>Title</h2>
+
       <input
         type="text"
-        name="summary"
-        id="summary"
-        value={summary}
-        onChange={(e) => setSummary(e.target.value)}
+        name="Title"
+        id="Title"
+        value={Title}
+        className="border-2"
+        onChange={(e) => setTitle(e.target.value)}
       />
 
       <h2>Description</h2>
       <textarea
         value={description}
+        className="border-2"
         onChange={(e) => setDescription(e.target.value)}
         rows={4}
         cols={50}
@@ -159,9 +167,20 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
           onSelect={handleSelect}
         />
       </div>
-
-      <button onClick={onClose}>Cancel</button>
-      <button type="submit">Submit</button>
+      <div className="mt-10 flex justify-around">
+        <button
+          className="bg-red-100 hover:bg-red-500 px-12 rounded py-2"
+          onClick={onClose}
+        >
+          Cancel
+        </button>
+        <button
+          className="bg-green-100 hover:bg-green-500 px-12 rounded py-2"
+          type="submit"
+        >
+          Submit
+        </button>
+      </div>
     </form>
   );
 };

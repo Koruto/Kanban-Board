@@ -9,4 +9,5 @@ export default interface TaskItem {
 
   user_id: string;
   username: string;
+  description: string;
 }
