@@ -53,7 +53,6 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
     e.preventDefault();
     // Add your signup form submission logic here
 
-    console.log('Signup Form submitted:', signupFormData);
     if (
       signupFormData.name == '' ||
       signupFormData.password == '' ||
@@ -72,7 +71,7 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
   const handleLoginSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Add your login form submission logic here
-    console.log('Login Form submitted:', loginFormData);
+
     if (loginFormData.password == '' || loginFormData.username == '') {
       alert('Log In Fields cannot be empty');
       return;
@@ -91,8 +90,6 @@ const Authentication: React.FC<AuthenticationProps> = ({ setLogIn }) => {
     }
 
     setLoginFormData({ username: '', password: '' });
-
-    console.log(key);
   };
 
   const [showLogin, setShowLogin] = useState(true);

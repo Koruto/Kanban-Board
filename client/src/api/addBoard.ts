@@ -10,9 +10,6 @@ export default async function addBoard(tableId: string) {
     if (!response.ok) {
       throw new Error('Failed to add table');
     }
-
-    const data = response;
-    console.log(data); // Use the response data as needed
   } catch (error) {
     console.error('Error:', error);
   }

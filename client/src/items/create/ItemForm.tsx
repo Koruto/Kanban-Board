@@ -54,7 +54,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
             user.username
         );
         setUserOptions(['Unassigned', ...usernames]);
-        console.log(usernames);
       } catch (error) {
         console.error('Error fetching column list:', error);
       }
@@ -74,10 +73,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    console.log('Title:', Title);
-    console.log('Selected options:', selectedValues);
-    console.log('Description:', description);
-
     if (Title == '') {
       alert('Title cannot be empty!');
       return;
@@ -90,8 +85,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
     // TODO Before Adding check if Title is empty or not, if it is then break it or something
 
     // TODO Upon Submit clear the form data too
-
-    console.log(columns);
 
     const userId =
       selectedValues['assignee'] == 'Unassigned'
@@ -118,10 +111,9 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
       'http://localhost:3000/add/issue',
       postData
     );
-    console.log(resulte);
+
     const updatedData = await fetchColumns();
     setColumns(updatedData);
-    console.log(updatedData);
 
     setTitle('');
     setSelectedValues({ status: '', assignee: 'Unassigned' });

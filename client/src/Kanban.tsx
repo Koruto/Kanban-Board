@@ -33,29 +33,14 @@ const onDragEnd: DragEndHandlerProps = (
   const { source, destination } = result;
 
   if (source.droppableId !== destination.droppableId) {
-    console.log(source, destination);
     const sourceColumn = columns[source.droppableId];
     const destColumn = columns[destination.droppableId];
-    console.log(
-      sourceColumn,
-      destColumn,
-      source,
-      destination,
-      columns,
-      sourceColumn.items[source.index]?.unique_id,
-      destColumn.title
-    );
+
     const sourceItems = [...sourceColumn.items];
     const destItems = [...destColumn.items];
     const [removed] = sourceItems.splice(source.index, 1);
     destItems.splice(destination.index, 0, removed);
 
-    console.log(
-      source.index,
-      source.droppableId,
-      destination.index,
-      destination.droppableId
-    );
     setColumns({
       ...columns,
       [source.droppableId]: {
@@ -86,9 +71,6 @@ const onDragEnd: DragEndHandlerProps = (
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-
-        const data = await response.text();
-        console.log(data); // Output: Rows updated: [number of rows updated]
       } catch (error) {
         console.error('Error:', error);
       }
@@ -114,7 +96,7 @@ async function updateData(
   setColumns: React.Dispatch<React.SetStateAction<ColumnList>>
 ) {
   const updatedData = await fetchColumns();
-  console.log(updatedData);
+
   setColumns(updatedData);
 }
 
@@ -140,12 +122,11 @@ const Kanban: React.FC<KanbanProps> = ({ setLogIn }) => {
     if (boardName == '') return;
     await addBoard(boardName);
     setBoardName('');
-    console.log('Adding Board');
+
     await updateData(setColumns);
   }
 
   async function handleDeleteBoard(columnId: string) {
-    console.log(columnId);
     const user = localStorage.getItem('user');
     if (user) {
       const data = JSON.parse(user);

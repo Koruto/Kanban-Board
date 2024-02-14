@@ -19,17 +19,14 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, index }) => {
     setColumns: React.Dispatch<React.SetStateAction<ColumnList>>
   ) {
     const updatedData = await fetchColumns();
-    console.log(updatedData);
+
     setColumns(updatedData);
   }
 
   async function handleDelete(uniqueId: string, user_id: string) {
-    console.log(uniqueId, user_id);
-
     const user = localStorage.getItem('user');
     if (!user) return;
     const userData = JSON.parse(user);
-    console.log(userData);
 
     if (
       userData.role != 'Admin' &&

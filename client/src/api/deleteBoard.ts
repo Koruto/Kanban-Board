@@ -15,7 +15,6 @@ export default async function (columnName: string) {
     }
 
     const data = await response.text();
-    console.log(data); // Log the response from the server
   } catch (error) {
     console.error('Error:', error);
   }
