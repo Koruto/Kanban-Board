@@ -47,7 +47,6 @@ Password: user
 3. React Icons
 
 <b> Backend </b>
-og
 
 1. Nodejs + ExpressJs
 
