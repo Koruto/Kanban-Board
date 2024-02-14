@@ -3,7 +3,7 @@ import ColumnList from '../types/ColumnList';
 import fetchColumnList from './fetchColumnList';
 import fetchData from './fetchData';
 
-async function fetchColumns(): Promise<ColumnList> {
+export async function fetchColumns(): Promise<ColumnList> {
   try {
     const data: { column_name: string }[] = await fetchColumnList();
 

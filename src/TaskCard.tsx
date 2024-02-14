@@ -1,11 +1,11 @@
 import { Draggable } from '@hello-pangea/dnd';
-import BlueArrow from './elements/BlueArrow';
-import CustomAvatar from './elements/CustomAvatar';
-import RedArrow from './elements/RedArrow';
-import YellowArrow from './elements/YellowArrow';
 import TaskItem from './types/TaskItem';
 import deleteRow from './api/deleteIssue';
-import ItemForm from './items/create/ItemForm';
+import { ColumnContext } from './ColumnContext';
+import { useContext } from 'react';
+import ColumnList from './types/ColumnList';
+import { fetchColumns } from './api/fetchColumns';
+import { MdDelete } from 'react-icons/md';
 
 interface TaskCardProps {
   item: TaskItem;
@@ -13,14 +13,38 @@ interface TaskCardProps {
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ item, index }) => {
-  function handleDelete(uniqueId: string) {
-    console.log(uniqueId);
+  const { setColumns } = useContext(ColumnContext);
 
-    deleteRow(uniqueId);
+  async function updateData(
+    setColumns: React.Dispatch<React.SetStateAction<ColumnList>>
+  ) {
+    const updatedData = await fetchColumns();
+    console.log(updatedData);
+    setColumns(updatedData);
   }
 
-  function handleEdit(uniqueId: string) {
-    console.log(uniqueId);
+  async function handleDelete(uniqueId: string, user_id: string) {
+    console.log(uniqueId, user_id);
+
+    const user = localStorage.getItem('user');
+    if (!user) return;
+    const userData = JSON.parse(user);
+    console.log(userData);
+
+    if (
+      userData.role != 'Admin' &&
+      user_id != '' &&
+      user_id != userData.user_id
+    ) {
+      alert(
+        'Cannot Delete this, only deleteable by admin or from the Assigned Person'
+      );
+      return;
+    }
+
+    deleteRow(uniqueId);
+
+    updateData(setColumns);
   }
 
   return (
@@ -31,20 +55,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, index }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <div className="flex flex-col justify-center items-start px-4 min-h-28 rounded-lg max-w-[311px] bg-white mt-4">
-            <p>{item.task}</p>
-            <button
-              onClick={() => handleDelete(item.unique_id)}
-              className="bg-red-100"
-            >
-              Delete
-            </button>
-            <button
-              onClick={() => handleEdit(item.unique_id)}
-              className="bg-blue-100"
-            >
-              Edit
-            </button>
+          <div className="flex flex-col justify-center items-start px-4 min-h-28 rounded-lg max-w-[311px] bg-white mt-4 w-full">
+            <div className="flex justify-between w-full">
+              <p>{item.task}</p>
+              <button
+                onClick={() => handleDelete(item.unique_id, item.user_id)}
+              >
+                <MdDelete fill="bg-red-400" size={24} style={{ fill: 'red' }} />
+              </button>
+            </div>
             <div className="flex justify-between items-center w-full text-xs font-normal text-[#7d7d7d]">
               <div>
                 <span>
@@ -54,23 +73,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ item, index }) => {
                   })}
                 </span>
 
-                <span className="priority">
-                  {item.priority === 'High' ? (
-                    <RedArrow />
-                  ) : item.priority === 'Medium' ? (
-                    <YellowArrow />
-                  ) : (
-                    <BlueArrow />
-                  )}
-                </span>
-
-                <div>
-                  <CustomAvatar
-                  // name={item.Assignee}
-                  // isTable={false}
-                  // size={16}
-                  />
-                </div>
+                <div>{item.username}</div>
               </div>
             </div>
           </div>

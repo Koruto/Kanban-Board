@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
 import SelectWithOptions from './SelectWithOptions';
-import { data } from '../../database/KanbanData';
 import fetchColumnList from '../../api/fetchColumnList';
 import postDataToBackend from '../../api/postIssue';
+import { useContext } from 'react';
+import { ColumnContext } from '../../ColumnContext';
+import { fetchColumns } from '../../api/fetchColumns';
+import getUsersList from '../../api/getUserList';
 
 interface ItemFormProps {
   onClose: () => void;
+}
+
+interface User {
+  username: string;
+  name: string;
+  user_id: string;
 }
 
 async function getColumnList() {
@@ -18,6 +27,8 @@ async function getColumnList() {
 }
 
 const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
+  const { columns, setColumns } = useContext(ColumnContext);
+
   const [selectedValues, setSelectedValues] = useState({
     status: '',
     assignee: 'Unassigned',
@@ -32,10 +43,23 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
     'Option 4',
   ]);
 
+  const [userOptions, setUserOptions] = useState(['Unassigned']);
+
+  const [userList, setUserList] = useState<User[]>([]);
+
   useEffect(() => {
     async function fetchData() {
       try {
         setStatusOptions(await getColumnList());
+
+        const data = await getUsersList();
+        setUserList(data);
+        const usernames = data.map(
+          (user: { username: string; name: string; user_id: string }) =>
+            user.username
+        );
+        setUserOptions(['Unassigned', ...usernames]);
+        console.log(usernames);
       } catch (error) {
         console.error('Error fetching column list:', error);
       }
@@ -43,7 +67,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
     fetchData();
   }, []);
 
-  const options = ['To-do', 'In Progress', 'Option 3', 'Option 4'];
+  // const options = ['To-do', 'In Progress', 'Option 3', 'Option 4'];
 
   const handleSelect = (name: string, value: string) => {
     setSelectedValues((prevState) => ({
@@ -59,32 +83,30 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
     console.log('Selected options:', selectedValues);
     console.log('Description:', description);
 
-    const str = data[data.length - 1].id;
-    const num = parseInt(str, 10);
-    const result = (num + 1).toString();
-    console.log(result);
-
     // TODO Before Adding check if Summary is empty or not, if it is then break it or something
 
     // TODO Upon Submit clear the form data too
 
-    const newItem = {
-      id: result,
-      Task: summary,
+    console.log(columns);
 
-      Assignee: selectedValues['assignee'],
-      Status: selectedValues['status'],
+    const userId =
+      selectedValues['assignee'] == 'Unassigned'
+        ? ''
+        : userList.find((user) => user.username === selectedValues['assignee'])
+            ?.user_id;
 
-      Priority: 'Low',
-      Due_Date: '25-May-2020',
-    };
-    data.push(newItem);
-    console.log(data);
+    const userName =
+      selectedValues['assignee'] == 'Unassigned'
+        ? 'Unassigned'
+        : userList.find((user) => user.username === selectedValues['assignee'])
+            ?.username;
 
     const postData = {
       task: summary,
       assignee: selectedValues['assignee'],
       status: selectedValues['status'],
+      user_id: userId,
+      username: userName,
     };
 
     const resulte = await postDataToBackend(
@@ -92,6 +114,9 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
       postData
     );
     console.log(resulte);
+    const newee = await fetchColumns();
+    setColumns(newee);
+    console.log(newee);
 
     onClose();
   };
@@ -130,7 +155,7 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
         <SelectWithOptions
           title="Unassigned"
           name="assignee"
-          options={options}
+          options={userOptions}
           onSelect={handleSelect}
         />
       </div>

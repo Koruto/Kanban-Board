@@ -3,13 +3,23 @@ import { DragDropContext, DropResult, Droppable } from '@hello-pangea/dnd';
 import TaskCard from './TaskCard';
 import ColumnList from './types/ColumnList';
 import CreateItem from './items/create/CreateTaskItem';
-import data from './api/fetchColumns';
+import data, { fetchColumns } from './api/fetchColumns';
+import addBoard from './api/addBoard';
+import deleteBoard from './api/deleteBoard';
+import { ColumnContext } from './ColumnContext';
+import initBoard from './api/initBoard';
+import { PiPlus } from 'react-icons/pi';
+import { MdDelete } from 'react-icons/md';
 
 type DragEndHandlerProps = (
   result: DropResult,
   columns: ColumnList,
   setColumns: React.Dispatch<React.SetStateAction<ColumnList>>
 ) => void;
+
+interface KanbanProps {
+  setLogIn: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 const onDragEnd: DragEndHandlerProps = (
   result: DropResult,
@@ -23,7 +33,15 @@ const onDragEnd: DragEndHandlerProps = (
     console.log(source, destination);
     const sourceColumn = columns[source.droppableId];
     const destColumn = columns[destination.droppableId];
-    console.log(sourceColumn, destColumn, source, destination, columns);
+    console.log(
+      sourceColumn,
+      destColumn,
+      source,
+      destination,
+      columns,
+      sourceColumn.items[source.index]?.unique_id,
+      destColumn.title
+    );
     const sourceItems = [...sourceColumn.items];
     const destItems = [...destColumn.items];
     const [removed] = sourceItems.splice(source.index, 1);
@@ -46,6 +64,34 @@ const onDragEnd: DragEndHandlerProps = (
         items: destItems,
       },
     });
+
+    const postData = {
+      uniqueId: sourceColumn.items[source.index]?.unique_id,
+      destTitle: destColumn.title,
+    };
+
+    async function updateIssue() {
+      try {
+        const response = await fetch('http://localhost:3000/updateIssue', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(postData),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.text();
+        console.log(data); // Output: Rows updated: [number of rows updated]
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    updateIssue();
   } else {
     const column = columns[source.droppableId];
     const copiedItems = [...column.items];
@@ -59,39 +105,18 @@ const onDragEnd: DragEndHandlerProps = (
       },
     });
   }
-
-  const postData = {
-    sourceId: source.index,
-    sourceDropId: source.droppableId,
-    destId: destination.index,
-    destDropId: destination.droppableId,
-  };
-
-  async function updateIssue() {
-    try {
-      const response = await fetch('http://localhost:3000/updateIssue', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.text();
-      console.log(data); // Output: Rows updated: [number of rows updated]
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
-
-  updateIssue();
 };
 
-const Kanban = () => {
+async function updateData(
+  setColumns: React.Dispatch<React.SetStateAction<ColumnList>>
+) {
+  const updatedData = await fetchColumns();
+  console.log(updatedData);
+  setColumns(updatedData);
+}
+
+const Kanban: React.FC<KanbanProps> = ({ setLogIn }) => {
+  const [boardName, setBoardName] = useState('');
   const [columns, setColumns] = useState<ColumnList>(data);
 
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
@@ -108,47 +133,115 @@ const Kanban = () => {
     setColumns(data);
   }, []);
 
+  async function handleAddBoard() {
+    if (boardName == '') return;
+    await addBoard(boardName);
+    setBoardName('');
+    console.log('Adding Board');
+    await updateData(setColumns);
+  }
+
+  async function handleDeleteBoard(columnId: string) {
+    console.log(columnId);
+    const user = localStorage.getItem('user');
+    if (user) {
+      const data = JSON.parse(user);
+      if (data.role != 'Admin') {
+        alert('Not An Admin');
+        return;
+      }
+    }
+
+    // Call the function with the column name you want to delete
+    await deleteBoard(columnId);
+    await updateData(setColumns);
+  }
+
+  function handleSignOut() {
+    localStorage.removeItem('user');
+    setLogIn(false);
+  }
+
+  const userDataString = localStorage.getItem('user');
+  let username = '';
+
+  if (userDataString !== null) {
+    const userData = JSON.parse(userDataString);
+    username = userData.username;
+  }
+
+  useEffect(() => {
+    initBoard();
+  }, []);
+
   return (
-    <DragDropContext
-      onDragEnd={(result) => onDragEnd(result, columns, setColumns)}
-    >
-      <div className="flex">
-        <div className="m-2 flex w-full min-h-[80vh]">
-          {Object.entries(columns).map(([columnId, column]) => {
-            return (
-              <Droppable key={columnId} droppableId={columnId}>
-                {(provided) => (
-                  <div
-                    className="min-h-[100px] flex flex-col bg-[#f3f3f3] min-w-[341px] rounded-lg p-4 mr-12"
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                  >
-                    <button
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                      onClick={openModal}
+    <ColumnContext.Provider value={{ columns, setColumns }}>
+      {username}
+      <br />
+      <button onClick={handleSignOut}>Sign Out</button>
+      <DragDropContext
+        onDragEnd={(result) => onDragEnd(result, columns, setColumns)}
+      >
+        <div className="flex">
+          <div className="m-2 flex w-full min-h-[80vh]">
+            {Object.entries(columns).map(([columnId, column]) => {
+              return (
+                <Droppable key={columnId} droppableId={columnId}>
+                  {(provided) => (
+                    <div
+                      className="min-h-[100px] flex flex-col bg-[#f3f3f3] min-w-[341px] rounded-lg p-4 mr-12 space-y-1"
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
                     >
-                      Add Issue
-                    </button>
-                    <CreateItem isOpen={showCreateModal} onClose={closeModal} />
-                    <div className="text-[#10957d] bg-[#10957d] bg-opacity-20 px-10 py-2 rounded-[5px] self-start">
-                      {column.title}
-                    </div>
-                    {column.items.map((item) => (
-                      <TaskCard
-                        key={item.unique_id}
-                        item={item}
-                        index={item.order_index}
+                      <CreateItem
+                        isOpen={showCreateModal}
+                        onClose={closeModal}
                       />
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            );
-          })}
+                      <div className="flex justify-between ">
+                        <div className="text-[#10957d] bg-[#10957d] bg-opacity-20 px-10 py-2 rounded-[5px] self-start capitalize">
+                          {column.title}
+                        </div>
+                        <button
+                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                          onClick={() => handleDeleteBoard(columnId)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                      <button
+                        className=" hover:bg-gray-300 text-black-100 font-bold py-2 px-4 rounded flex items-center justify-start pl-8"
+                        onClick={openModal}
+                      >
+                        <PiPlus />
+                        <span className="ml-1">Create Issue</span>
+                      </button>
+
+                      {column.items.map((item, index) => (
+                        <TaskCard
+                          key={item.unique_id}
+                          item={item}
+                          index={index}
+                        />
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              );
+            })}
+            <div>
+              <input
+                type="text"
+                value={boardName}
+                onChange={(e) => setBoardName(e.target.value)}
+                placeholder="Enter board name"
+              />
+              <button onClick={handleAddBoard}>Add New Board</button>
+            </div>
+          </div>
         </div>
-      </div>
-    </DragDropContext>
+      </DragDropContext>
+    </ColumnContext.Provider>
   );
 };
 
