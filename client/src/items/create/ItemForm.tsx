@@ -119,9 +119,13 @@ const ItemForm: React.FC<ItemFormProps> = ({ onClose }) => {
       postData
     );
     console.log(resulte);
-    const newee = await fetchColumns();
-    setColumns(newee);
-    console.log(newee);
+    const updatedData = await fetchColumns();
+    setColumns(updatedData);
+    console.log(updatedData);
+
+    setTitle('');
+    setSelectedValues({ status: '', assignee: 'Unassigned' });
+    setDescription('');
 
     onClose();
   };
